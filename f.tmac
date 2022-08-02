@@ -1,0 +1,136 @@
+.\" -*- mode: nroff -*-
+.ig
+
+f.tmac - troff formatting for screenplays
+
+Copyright (c) 2022 Paul W. Rankin <hello@paulwrankin.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at
+your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+..
+.\" Basic screenplay variables for point-size (PS),
+.\" vertical space (VS), page width (PW) and page length (PL).
+.
+.if !rPS .nr PS 12
+.ps \n[PS]
+.if !rVS .nr VS 12
+.vs \n[VS]
+.if !rPW .nr PW 6
+.ll \n[PW]i
+.if !rPL .nr PL 11
+.pl \n[PL]i
+.
+.\" Variables for formatting scene headings:
+.\" SS = spacing
+.\" SB = bold
+.\" SU = underline
+.
+if !rSS .nr 2
+if !rSB .nr SB 0
+if !rSU .nr SU 0
+.
+.\" Number first page.
+.
+if !rP1 .nr P1 0
+.
+.\" No hyphenation.
+.
+.nh
+.
+.\" Formatting reset.
+.
+.de RS
+.ft C
+.ad l
+.po 1.25i
+.ll \\n[PW]i
+.in 0
+..
+.\" Normal page header.
+.
+.de HD
+'sp 0.5i
+'tl '''%%.'
+'sp |1i
+..
+.\" Page-1 header.
+.
+.de H1
+'sp |1i
+.wh 0 HD
+..
+.\" Insert blank line space - ensure we don't add extra space at
+ \" top-of-page (PP).
+.
+.de SP
+.if !\\n[PP] .sp 1
+.nr PP 0
+..
+.\" Action
+.
+.de AA
+.RS
+.SP
+..
+.\" Scene heading.
+.
+.de SH
+.RS
+.if !\\n[PP] .sp \\n[SS]
+.if \\n[SB] .ft CB
+..
+.\" Character name.
+.
+.de CH
+.RS
+.SP
+.in 2.5i
+.ll -1i
+..
+.\" Parenthetical.
+.
+.de PR
+.RS
+.in 2i
+.ll -2.4i
+.ti -8p
+..
+.\" Dialogue.
+.
+.de DL
+.RS
+.in 1.5i
+.ll -1i
+..
+.\" Transition.
+.
+.de TR
+.RS
+.SP
+.in 4i
+..
+.\" Center text.
+.
+.de CT
+.RS
+.ad c
+..
+.\" New page.
+.
+.de NP
+.nr PP 1
+.bp
+..
+.ie \\n[NF] .wh 0 HD
+.el .wh 0 FH
+.wh \\n[PL]i NP
