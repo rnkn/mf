@@ -3,7 +3,7 @@
 
 f.tmac - troff formatting for screenplays
 
-Copyright (c) 2022 Paul W. Rankin <hello@paulwrankin.com>
+Copyright (c) 2022-2024 Paul W. Rankin <rnkn@rnkn.xyz>
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,119 +18,164 @@ General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 ..
-.\" Basic screenplay variables for point-size (PS),
-.\" vertical space (VS), page width (PW) and page length (PL).
-.
+.do xflag 3
 .if !rPS .nr PS 12
 .ps \n[PS]
-.if !rVS .nr VS 12
+.if !rVS .nr VS 12.5
 .vs \n[VS]
 .if !rPW .nr PW 6
 .ll \n[PW]i
-.if !rPL .nr PL 11
-.pl \n[PL]i
+.pl 999
 .
-.\" Variables for formatting scene headings:
-.\" SS = spacing
-.\" SB = bold
-.\" SU = underline
-.
-if !rSS .nr 2
-if !rSB .nr SB 0
-if !rSU .nr SU 0
-.
-.\" Number first page.
-.
-if !rP1 .nr P1 0
-.
-.\" No hyphenation.
-.
+.if !rscenespace .nr scenespace 2
+.if !rscenebold .nr scenebold 0
+.if !rsceneunderline .nr sceneunderline 0
+.if !rnumberfirst .nr numberfirst 0
+.if !rscenenumbers .nr scenenumbers 0
+.nr pagetop 1
+.po 1.25i
+.nf
 .nh
 .
-.\" Formatting reset.
-.
-.de RS
+.\" Format reset
+.de reset
 .ft C
-.ad l
-.po 1.25i
-.ll \\n[PW]i
-.in 0
+'ce 0
+'in 0
 ..
-.\" Normal page header.
-.
-.de HD
-'sp 0.5i
-'tl '''%%.'
-'sp |1i
+.\" Blank line
+.de blank
+.sp |\\n[.h]u
+.ie \\n[pagetop] .sp |1i
+.el .sp 1
+.nr pagetop 0
 ..
-.\" Page-1 header.
-.
-.de H1
-'sp |1i
-.wh 0 HD
+.\" Normal page header
+.de header
+.sp 0.5i
+.tl '''%.'
+.sp |1i
 ..
-.\" Insert blank line space - ensure we don't add extra space at
- \" top-of-page (PP).
-.
-.de SP
-.if !\\n[PP] .sp 1
-.nr PP 0
+.\" Blank page header
+.de headerblank
+.sp 0.5i
+.tl ''''
+.sp |1i
+.wh 0 header
 ..
 .\" Action
-.
-.de AA
-.RS
-.SP
+.de action
+.reset
+.blank
 ..
-.\" Scene heading.
-.
-.de SH
-.RS
-.if !\\n[PP] .sp \\n[SS]
-.if \\n[SB] .ft CB
+.\" Scene heading
+.de scene-heading
+.reset
+.sp |\\n[.h]u
+.ie \\n[pagetop] .sp |1i
+.el .sp \n[scenespace]
+.nr pagetop 0
+.if \\n[scenebold] .ft 8
+.if \\n[scenenumbers] \{\
+\h[|-0.75i] \\$1 \h[|6i] \\$1
+.sp -1 \}
 ..
-.\" Character name.
-.
-.de CH
-.RS
-.SP
+.\" Character name
+.de character
+.reset
+.blank
 .in 2.5i
-.ll -1i
 ..
-.\" Parenthetical.
-.
-.de PR
-.RS
+.\" Parenthetical
+.de paren
+.reset
 .in 2i
-.ll -2.4i
 .ti -8p
 ..
-.\" Dialogue.
-.
-.de DL
-.RS
+.\" Dialogue
+.de dialog
+.reset
 .in 1.5i
-.ll -1i
 ..
-.\" Transition.
-.
-.de TR
-.RS
-.SP
+.\" Transition
+.de trans
+.reset
+.blank
 .in 4i
 ..
-.\" Center text.
-.
-.de CT
-.RS
-.ad c
+.\" Dual-dialogue character name (left)
+.de dual-character-left
+.reset
+.blank
+.mk dualtop
+.in 1i
 ..
-.\" New page.
-.
-.de NP
-.nr PP 1
-.bp
+.\" Dual-dialogue parenthetical (left)
+.de dual-paren-left
+.reset
+.in 0.5i
+.ti -8p
 ..
-.ie \\n[NF] .wh 0 HD
-.el .wh 0 FH
-.wh \\n[PL]i NP
+.\" Dual dialogue (left)
+.de dual-dialog-left
+.reset
+..
+.\" Dual-dialogue character name (right)
+.de dual-character-right
+.reset
+.blank
+.sp |\\n[dualtop]u
+.in 4i
+..
+.\" Dual-dialogue parenthetical (right)
+.de dual-paren-right
+.reset
+.in 3.3i
+..
+.\" Dual dialogue (right)
+.de dual-dialog-right
+.reset
+.in 3.1i
+..
+.\" Center text
+.de center
+.reset
+.blank
+.ce 99
+..
+.\" Page break
+.de page-break
+.bp \\$1
+.nr pagetop 1
+..
+.\" Title page title section line
+.de titleline
+.reset
+.sp
+.ce 99
+..
+.\" Title page contact/note section line
+.de titlenote
+.reset
+.sp
+..
+.reset
+.\" Title page
+.reset
+.sp |4i
+.titleline
+TITLE
+.titleline
+written by
+.titleline
+Author
+.sp |8i
+.titlenote
+Contact info
+.page-break
+.br
+.\" Page 1.
+.nr % 0
+.ie \n[numberfirst] .wh 0 header
+.el .wh 0 headerblank
+.nr nl -1
